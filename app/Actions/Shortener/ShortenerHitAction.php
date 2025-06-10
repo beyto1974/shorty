@@ -3,15 +3,14 @@
 namespace App\Actions\Shortener;
 
 use App\Models\Shortener;
+use DB;
 use Illuminate\Support\Facades\Log;
 
 class ShortenerHitAction
 {
     public static function run(Shortener $shortener): Shortener
     {
-        $shortener->hits = $shortener->hits + 1;
-
-        $shortener->update();
+        DB::table('shorteners')->where('id', $shortener->id)->increment('hits');
 
         Log::info('Shortener hit', [
             ...$shortener->only([
