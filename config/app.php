@@ -125,4 +125,5 @@ return [
 
     'handle_length' => env('HANDLE_LENGTH', 6),
     'handle_alphabet' => env('HANDLE_ALPHABET'),
+    'master_token' => env('MASTER_TOKEN', ''),
 ];

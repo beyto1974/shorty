@@ -32,4 +32,9 @@ class Shortener extends Model
             'shortener' => $this,
         ]);
     }
+
+    public function getRedirectUrlAttribute(): string
+    {
+        return $this->getRedirectUrl();
+    }
 }

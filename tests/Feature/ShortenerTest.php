@@ -7,7 +7,9 @@ use App\Models\User;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\delete;
 use function Pest\Laravel\get;
+use function Pest\Laravel\post;
 use function Pest\Laravel\put;
+use function Pest\Laravel\putJson;
 
 beforeEach(function () {
     actingAs(User::orderBy('id')->first());
@@ -27,7 +29,13 @@ it('can request URL', function () {
 });
 
 it('can create', function () {
-    put('/api/shortener')->assertStatus(302);
+    putJson('/api/shortener')->assertStatus(422);
+
+    $shortenerArr = putJson('/api/shortener', [
+        'original_url' => 'invalid-url',
+    ])
+        ->assertStatus(422)
+        ->json();
 
     $shortenerArr = put('/api/shortener', [
         'original_url' => $url = fake()->url(),
@@ -83,4 +91,35 @@ it('can delete', function () {
 
 it('cannot delete unexisting', function () {
     delete('/api/shortener/999999')->assertStatus(404);
+});
+
+it('can search', function () {
+    Shortener::factory()->count(5)->create();
+
+    $result = post('/api/shortener/search')->assertStatus(200)->json();
+
+    expect($result)->toHaveKeys(['data', 'per_page', 'total']);
+    expect($result['total'])->toBeGreaterThan(4);
+
+    $shortener = Shortener::factory()->create();
+
+    /**
+     * Search by original_url.
+     */
+    $result = post('/api/shortener/search', [
+        'search' => $shortener->original_url,
+    ])->assertStatus(200)->json();
+
+    expect($result['data'])->toHaveCount(1);
+    expect($result['data'][0]['id'])->toBe($shortener->id);
+
+    /**
+     * Search by handle.
+     */
+    $result = post('/api/shortener/search', [
+        'search' => $shortener->handle,
+    ])->assertStatus(200)->json();
+
+    expect($result['data'])->toHaveCount(1);
+    expect($result['data'][0]['handle'])->toBe($shortener->handle);
 });

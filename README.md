@@ -1,13 +1,25 @@
 # Shorty
-A very simple URL shortener microservice.
+A very simple REST based URL shortener microservice.
 
 ## Setup
-Optional .env-variables:
-- HANDLE_LENGTH
-- HANDLE_ALPHABET
+Required .env-variables:
+- APP_URL
 
-## Access
-Create a user and a token for each application.
+Optional .env-variables:
+- MASTER_TOKEN: To access global stats endpoint
+- HANDLE_LENGTH (defaults to 6)
+- HANDLE_ALPHABET (defaults to pugx/shortid-php value, must be 64 characters long)
+
+## Example output
+Where domain name is dev.shorty.pro:
+
+- dev.shorty.pro/XTDD1u
+- dev.shorty.pro/ukkwiK
+
+## API usage
+
+### Authentication
+Create a user and a **bearer token** for each consumer.
 
 Create user:
 ```php
@@ -29,3 +41,11 @@ Delete users when necessary (deleting all shorteners).
 Shortener::where('created_by_user_id', User::firstWhere('name', 'Johny')->id)->delete();
 User::firstWhere('name', 'Johny')->delete()
 ```
+
+### Endpoints
+- PUT /shortener with body {original_url: string} and status code 201 or 422 ({essage: string, errors: laravel_validation_errors}).
+- GET /shortener/{id} with body {id: number, original_url: string, handle: string, redirect_url: string} and status code 200 or 404.
+- DELETE /shortener/{id} with status code 200.
+
+## Other features
+- Status page returing {'ok': true}
