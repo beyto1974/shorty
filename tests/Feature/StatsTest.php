@@ -42,7 +42,6 @@ it('can get global stats', function () {
         'user',
         'stats',
     ]);
-    dd($stats['users']);
 
     expect($stats['users'][0]['stats'])->toHaveKeys([
         'used',
