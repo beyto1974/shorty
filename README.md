@@ -55,6 +55,7 @@ User::firstWhere('name', 'Johny')->delete()
 
 ## Other features
 - Status page returing {'ok': true}
+- Web user interface on /ui/ for bulk shortener creation.
 
 ## Security suggestions
 - /doc/ and /ui/ can be protected/forbidden.
