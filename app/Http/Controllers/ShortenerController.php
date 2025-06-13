@@ -15,7 +15,7 @@ class ShortenerController extends Controller
             'original_url' => 'required|url',
         ]);
 
-        return ShortenerCreateAction::run($post, auth()->user());
+        return ShortenerCreateAction::run($post, auth()->user())->append('redirect_url');
     }
 
     public function get(Shortener $shortener)
