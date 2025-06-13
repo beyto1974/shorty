@@ -4,6 +4,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
+        "build-doc": "npx -y @redocly/cli build-docs openapi.yaml --output public/doc/index.html",
         "dev": "vite"
     },
     "devDependencies": {

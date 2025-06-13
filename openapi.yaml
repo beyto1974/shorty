@@ -4,13 +4,20 @@ info:
   description: A very simple REST based URL shortener microservice.
   termsOfService: http://swagger.io/terms/
   contact:
-    email: todo@swagger.io
+    url: https://github.com/beyto1974/shorty
   license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    name: GPL-3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.html
   version: 1.0.0
 servers:
-  - url: https://petstore3.swagger.io/api/v3
+  - url: /
+  - url: https://{domain}:{port}/v2
+    variables:
+      domain:
+        default: ""
+        description: Customer ID assigned by the service provider
+      port:
+        default: '443'
 tags:
   - name: status
   - name: shortener

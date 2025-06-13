@@ -10,6 +10,17 @@ Optional .env-variables:
 - HANDLE_LENGTH (defaults to 6)
 - HANDLE_ALPHABET (defaults to pugx/shortid-php value, must be 64 characters long)
 
+Database:
+- Set the database .env-variables.
+- Run the migration.
+
+## Deploy
+- Use by preference [https://deployer.org/](Deployer).
+- Run the following to build the doc:
+```bash
+pnpm build-doc
+```
+
 ## Example output
 Where domain name is dev.shorty.pro:
 
@@ -42,14 +53,13 @@ Shortener::where('created_by_user_id', User::firstWhere('name', 'Johny')->id)->d
 User::firstWhere('name', 'Johny')->delete()
 ```
 
-### Endpoints
-- PUT /shortener with body {original_url: string} and status code 201 or 422 ({essage: string, errors: laravel_validation_errors}).
-- GET /shortener/{id} with body {id: number, original_url: string, handle: string, redirect_url: string} and status code 200 or 404.
-- DELETE /shortener/{id} with status code 200.
-
 ## Other features
 - Status page returing {'ok': true}
+
+## Security suggestions
+- /doc/ and /ui/ can be protected/forbidden.
 
 ## TODO
 - Custom 404 page.
 - Master endpoints for user and token CRUD.
+- Pass handle on create.
