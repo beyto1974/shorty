@@ -11,4 +11,8 @@ Route::get('/status', function () {
     return ['ok' => true];
 });
 
+Route::get('/ui', function () {
+    return view('ui');
+});
+
 Route::get('/{shortener:handle}', [ShortenerController::class, 'redirect'])->name('shortener');

@@ -1,0 +1,144 @@
+<div id="app" class="container">
+    <h1>Shorty-UI</h1>
+
+    <div class="row shadow mt-4 pb-2">
+        <div class="col-12">
+            <h2>Authentication</h2>
+
+            <label for="token">Token</label>
+
+            <div class="input-group">
+                <input v-model="token" id="token" class="form-control" type="password" required />
+                <button type="button" class="btn btn-secondary" @click="forgetToken()"
+                    :disabled="!token || isLoading">Forget token
+            </div>
+        </div>
+    </div>
+
+    <form class="row shadow pb-2 mt-4" @submit.prevent="bulkCreate()">
+        <div class="col-12 pb-2">
+            <h2>Request <span class="text-muted">({{ getCleanBulkInput().length }})</span></h2>
+
+            <label for="bulkInput">URL list</label>
+            <textarea v-model="bulkInput" id="bulkInput" class="form-control" rows="5" required></textarea>
+        </div>
+
+        <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-outline-primary" :disabled="!bulkInput || !token || isLoading">Bulk create</button>
+        </div>
+    </form>
+
+    <div class="row shadow mt-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h2>Response <span class="text-muted">({{ responseList.length }})</span></h2>
+                </div>
+                <div>
+                    <span v-if="responseList.length !== 0" class="btn btn-sm btn-secondary m-1"
+                        @click="clearResponse()">Clear response
+                    </span>
+                </div>
+            </div>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Redirect URL</th>
+                        <th>Original URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="responseList.length === 0">
+                        <td colspan="10">None</td>
+                    </tr>
+                    <tr v-for="responseSearch in responseList" :key="responseSearch.id">
+                        <td>
+                            <a :href="responseSearch.redirect_url">{{ responseSearch.redirect_url }}</a>
+                        </td>
+                        <td>
+                            <a :href="responseSearch.original_url">{{ responseSearch.original_url }}</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+    import axios from 'https://unpkg.com/axios@1.9.0/dist/esm/axios.min.js'
+
+    createApp({
+        setup() {
+            const token = ref(localStorage.getItem('token'))
+
+            const bulkInput = ref('')
+            const responseList = ref([])
+            const isLoading = ref(false)
+
+            function clearResponse() {
+                responseList.value = []
+            }
+
+            function forgetToken() {
+                localStorage.removeItem('token')
+
+                token.value = ''
+            }
+
+            function getCleanBulkInput() {
+                return bulkInput.value.split("\n").filter(s => s)
+            }
+
+            async function bulkCreate() {
+                if (isLoading.value) {
+                    return
+                }
+
+                isLoading.value = true
+
+                localStorage.setItem('token', token.value)
+
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
+
+                try {
+                    const bulkList = getCleanBulkInput()
+
+                    for (let i = 0; i < bulkList.length; i++) {
+                        responseList.value.push(
+                            (
+                                await axios.put('/api/shortener', {
+                                    original_url: bulkList[i],
+                                })
+                            ).data
+                        )
+
+                        bulkInput.value = bulkInput.value.split("\n").filter(s => s !== bulkList[i]).join("\n")
+                    }
+                } catch (error) {
+                    console.error('bulkCreate', error)
+
+                    if (error.response?.data?.message) {
+                        alert(error.response?.data?.message)
+                    } else {
+                        alert(error.message)
+                    }
+                } finally {
+                    isLoading.value = false
+                }
+            }
+
+            return {
+                token,
+                bulkInput,
+                responseList,
+                clearResponse,
+                forgetToken,
+                bulkCreate,
+                getCleanBulkInput,
+            }
+        }
+    }).mount('#app')
+</script>
