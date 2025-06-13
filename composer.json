@@ -1,13 +1,15 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "beyto1974/shorty",
     "type": "project",
     "description": "URL shortener microservice",
     "keywords": [
         "laravel",
-        "framework"
+        "url shortener",
+        "rest api",
+        "vue"
     ],
-    "license": "MIT",
+    "license": "GPL-3.0",
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
