@@ -40,10 +40,18 @@ class ShortenerController extends Controller
                 ->orWhere('handle', 'ILIKE', "%$search%");
         }));
 
-        return $query->paginate(
+        $results = $query->paginate(
             perPage: request()->integer('per_page', 15),
             page: request()->integer('page', 1),
         );
+
+        $results->getCollection()->transform(function ($item) {
+            $item->setAppends(['redirect_url']);
+
+            return $item;
+        });
+
+        return $results;
     }
 
     public function redirect(Shortener $shortener)

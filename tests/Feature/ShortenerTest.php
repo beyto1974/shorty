@@ -100,6 +100,7 @@ it('can search', function () {
 
     expect($result)->toHaveKeys(['data', 'per_page', 'total']);
     expect($result['total'])->toBeGreaterThan(4);
+    expect($result['data'][0])->toHaveKey('redirect_url');
 
     $shortener = Shortener::factory()->create();
 
