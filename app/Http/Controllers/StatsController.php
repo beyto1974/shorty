@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\HandleHelper;
 use App\Models\Shortener;
+use App\Models\User;
 
 class StatsController extends Controller
 {
@@ -13,26 +14,21 @@ class StatsController extends Controller
         $totalCount = HandleHelper::getCombinationCount();
 
         return [
-            'used' => $globalUsedCount,
-            'free' => $totalCount - $globalUsedCount,
-            'total' => $totalCount,
-            'hits' => Shortener::sum('hits'),
+            'global' => [
+                'used' => $globalUsedCount,
+                'free' => $totalCount - $globalUsedCount,
+                'total' => $totalCount,
+                'hits' => Shortener::sum('hits'),
+            ],
+            'users' => User::orderBy('name')->get()->map(fn (User $user) => [
+                'user' => $user,
+                'stats' => $user->getStats(),
+            ]),
         ];
     }
 
     public function getUserStats()
     {
-        $byUserQuery = Shortener::where('created_by_user_id', auth()->user()->id);
-
-        $globalUsedCount = Shortener::count();
-        $userUsedCount = $byUserQuery->clone()->count();
-        $totalCount = HandleHelper::getCombinationCount();
-
-        return [
-            'used' => $userUsedCount,
-            'free' => $totalCount - $globalUsedCount,
-            'total' => $totalCount,
-            'hits' => $byUserQuery->clone()->sum('hits'),
-        ];
+        return auth()->user()->getStats();
     }
 }

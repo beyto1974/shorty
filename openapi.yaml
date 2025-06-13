@@ -1,0 +1,263 @@
+openapi: 3.0.3
+info:
+  title: shorty
+  description: A very simple REST based URL shortener microservice.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: todo@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+tags:
+  - name: status
+  - name: shortener
+  - name: stats
+paths:
+  /status:
+    get:
+      tags:
+        - status
+      summary: Get status info
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+  /api/stats:
+    get:
+      tags:
+        - stats
+      summary: Get global stats
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlobalStats'          
+      security:
+        - master_auth: []
+  /api/user/stats:
+    get:
+      tags:
+        - stats
+      summary: Get current user stats
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stats'          
+      security:
+        - master_auth: []
+  /api/shortener:
+    put:
+      tags:
+        - shortener
+      summary: Create shortener
+      PayloadBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortenerCreatePayload'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shortener'          
+        '400':
+          description: Invalid payload
+        '401':
+          description: Invalid token
+      security:
+        - user_auth: []
+    post:
+      tags:
+        - shortener
+      summary: Search shorteners
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortenerSearchPayload'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortenerSearchResponse'          
+        '400':
+          description: Invalid payload
+        '401':
+          description: Invalid token
+      security:
+        - user_auth: []
+  /api/shortener/{id}:
+    get:
+      tags:
+        - shortener
+      summary: Get shortener
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shortener'          
+        '401':
+          description: Invalid token
+        '404':
+          description: Not found
+      security:
+        - user_auth: []
+    delete:
+      tags:
+        - shortener
+      summary: Delete shortener
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shortener'          
+        '401':
+          description: Invalid token
+        '404':
+          description: Not found
+      security:
+        - user_auth: []
+components:
+  schemas:
+    Status:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+    Stats:
+      type: object
+      properties:
+        used:
+          type: integer
+          example: 96
+        free:
+          type: integer
+          example: 87700
+        total:
+          type: integer
+          example: 87796
+        hits:
+          type: integer
+          example: 300
+    GlobalStats:
+      type: object
+      properties:
+        global:
+          type: object
+          $ref: "#/components/schemas/Stats"
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              user:
+                type: object
+                $ref: "#/components/schemas/User"
+              stats:
+                type: object
+                $ref: "#/components/schemas/Stats"
+    ShortenerCreatePayload:
+      required:
+        - original_url
+      type: object
+      properties:
+        original_url:
+          type: string
+          example: https://www.example.com/abcdefg
+    ShortenerSearchPayload:
+      type: object
+      properties:
+        per_page:
+          type: integer
+          example: 15
+        current_page:
+          type: integer
+          example: 1
+        search:
+          type: string
+          description: Part of original_url of handle, non-case sensitive.
+    ShortenerSearchResponse:
+      type: object
+      properties:
+        per_page:
+          type: integer
+          example: 15
+        current_page:
+          type: integer
+          example: 1
+        total:
+          type: integer
+          example: 1
+        data:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/Shortener'
+    Shortener:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 560
+        handle:
+          type: integer
+          example: "Ab0_xT"
+        original_url:
+          type: string
+          example: https://www.example.com/abcdefg
+        redirect_url:
+          type: string
+          example: https://dev.shorty.pro/Ab0_xT
+        hits:
+          type: integer
+          example: 14
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 560
+        name:
+          type: string
+          example: "John Doe"
+  securitySchemes:
+    user_auth:
+      type: http
+      scheme: bearer
+    master_auth:
+      type: http
+      scheme: bearer

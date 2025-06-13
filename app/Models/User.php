@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Helpers\HandleHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -54,6 +56,22 @@ class User extends Authenticatable
         return [
             'id' => $this->id,
             'email' => $this->email,
+        ];
+    }
+
+    public function getStats(): array
+    {
+        $byUserQuery = Shortener::where('created_by_user_id', $this->id);
+
+        $globalUsedCount = Shortener::count();
+        $userUsedCount = $byUserQuery->clone()->count();
+        $totalCount = HandleHelper::getCombinationCount();
+
+        return [
+            'used' => $userUsedCount,
+            'free' => $totalCount - $globalUsedCount,
+            'total' => $totalCount,
+            'hits' => $byUserQuery->clone()->sum('hits'),
         ];
     }
 }

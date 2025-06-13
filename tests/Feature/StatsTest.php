@@ -27,6 +27,24 @@ it('can get global stats', function () {
     $stats = withToken(Config::string('app.master_token'))->getJson('/api/stats')->assertStatus(200)->json();
 
     expect($stats)->toHaveKeys([
+        'global',
+        'users',
+    ]);
+
+    expect($stats['global'])->toHaveKeys([
+        'used',
+        'free',
+        'total',
+        'hits',
+    ]);
+
+    expect($stats['users'][0])->toHaveKeys([
+        'user',
+        'stats',
+    ]);
+    dd($stats['users']);
+
+    expect($stats['users'][0]['stats'])->toHaveKeys([
         'used',
         'free',
         'total',
