@@ -49,3 +49,7 @@ User::firstWhere('name', 'Johny')->delete()
 
 ## Other features
 - Status page returing {'ok': true}
+
+## TODO
+- Custom 404 page.
+- Master endpoints for user and token CRUD.
