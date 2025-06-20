@@ -34,7 +34,7 @@ Create a user and a **bearer token** for each consumer.
 
 Create user:
 ```php
-User::factory()->create(['name' => 'Johny', 'email' => 'test@example.com'])
+(new User(['name' => 'Johny', 'email' => 'test@example.com', 'password' => Hash::make(Str::random())]))
 ```
 
 Create token:
