@@ -123,7 +123,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'handle_length' => env('HANDLE_LENGTH', 6),
+    'handle_length' => (int) env('HANDLE_LENGTH', 6),
     'handle_alphabet' => env('HANDLE_ALPHABET'),
     'master_token' => env('MASTER_TOKEN', ''),
 ];
