@@ -5,8 +5,10 @@ use App\Http\Controllers\StatsController;
 use App\Http\Middleware\DBTransactionMiddleware;
 use App\Http\Middleware\MasterTokenAuth;
 use App\Http\Middleware\OwnerMiddleware;
+use App\Mcp\Servers\ShortenerServer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Mcp\Facades\Mcp;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -30,6 +32,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Stats endpoint - moderate limit
     Route::get('/user/stats', [StatsController::class, 'getUserStats'])
         ->middleware('throttle:120,1');
+
+    Mcp::web('/mcp/shortener', ShortenerServer::class)
+        ->middleware(['throttle:60,1']);
 });
 
 Route::middleware(MasterTokenAuth::class)->group(function () {

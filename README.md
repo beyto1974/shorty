@@ -53,6 +53,14 @@ Shortener::where('created_by_user_id', User::firstWhere('name', 'Johny')->id)->d
 User::firstWhere('name', 'Johny')->delete()
 ```
 
+## MCP server
+
+Use the same bearer token.
+
+Only http interface supported.
+
+URL: https://www.example/api/mcp/shortener
+
 ## Other features
 - Status page returing {'ok': true}
 - Web user interface on /ui/ for bulk shortener creation.
