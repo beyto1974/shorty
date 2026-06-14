@@ -124,6 +124,6 @@ return [
     ],
 
     'handle_length' => (int) env('HANDLE_LENGTH', 6),
-    'handle_alphabet' => env('HANDLE_ALPHABET'),
+    'handle_alphabet' => env('HANDLE_ALPHABET') ?: null,
     'master_token' => env('MASTER_TOKEN', ''),
 ];
