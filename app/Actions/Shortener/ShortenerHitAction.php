@@ -17,6 +17,7 @@ class ShortenerHitAction
                 'id',
                 'handle',
                 'original_url',
+                'hit',
             ]),
             'ip' => request()->ip(),
         ]);
