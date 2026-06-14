@@ -13,12 +13,23 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::put('/shortener', [ShortenerController::class, 'put'])->middleware(DBTransactionMiddleware::class);
-    Route::get('/shortener/{shortener}', [ShortenerController::class, 'get'])->middleware(OwnerMiddleware::class);
-    Route::delete('/shortener/{shortener}', [ShortenerController::class, 'delete'])->middleware([OwnerMiddleware::class, DBTransactionMiddleware::class]);
-    Route::post('/shortener/search', [ShortenerController::class, 'search']);
+    // More restrictive for search (might be expensive)
+    Route::post('/shortener/search', [ShortenerController::class, 'search'])
+        ->middleware('throttle:30,1');
 
-    Route::get('/user/stats', [StatsController::class, 'getUserStats']);
+    // Regular limits for other endpoints
+    Route::put('/shortener', [ShortenerController::class, 'put'])
+        ->middleware([DBTransactionMiddleware::class, 'throttle:60,1']);
+
+    Route::get('/shortener/{shortener}', [ShortenerController::class, 'get'])
+        ->middleware([OwnerMiddleware::class, 'throttle:60,1']);
+
+    Route::delete('/shortener/{shortener}', [ShortenerController::class, 'delete'])
+        ->middleware([OwnerMiddleware::class, DBTransactionMiddleware::class, 'throttle:60,1']);
+
+    // Stats endpoint - moderate limit
+    Route::get('/user/stats', [StatsController::class, 'getUserStats'])
+        ->middleware('throttle:120,1');
 });
 
 Route::middleware(MasterTokenAuth::class)->group(function () {
