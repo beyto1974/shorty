@@ -9,6 +9,7 @@ Optional .env-variables:
 - MASTER_TOKEN: To access global stats endpoint
 - HANDLE_LENGTH (defaults to 6)
 - HANDLE_ALPHABET (defaults to pugx/shortid-php value, must be 64 characters long)
+- URL_TRACKING: Adds if existing: utm_source, utm_medium, utm_campaign, utm_content, utm_term using query params and referer using header.
 
 Database:
 - Set the database .env-variables.

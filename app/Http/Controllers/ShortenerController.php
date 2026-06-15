@@ -6,6 +6,7 @@ use App\Actions\Shortener\ShortenerCreateAction;
 use App\Actions\Shortener\ShortenerDeleteAction;
 use App\Actions\Shortener\ShortenerHitAction;
 use App\Models\Shortener;
+use Illuminate\Support\Facades\Config;
 
 class ShortenerController extends Controller
 {
@@ -56,8 +57,82 @@ class ShortenerController extends Controller
 
     public function redirect(Shortener $shortener)
     {
+        // Validate UTM parameters from request
+        request()->validate([
+            'utm_source' => 'nullable|string|max:256',
+            'utm_medium' => 'nullable|string|max:256',
+            'utm_campaign' => 'nullable|string|max:256',
+            'utm_content' => 'nullable|string|max:256',
+            'utm_term' => 'nullable|string|max:256',
+        ]);
+
         ShortenerHitAction::run($shortener);
 
-        return redirect($shortener->original_url);
+        $url = $shortener->original_url;
+
+        if (Config::boolean('app.url_tracking')) {
+            // Build tracking parameters
+            $params = [];
+
+            // Add referer from current request
+            $referer = request()->header('Referer');
+            if ($referer) {
+                // Sanitize and limit referer length
+                $referer = $this->sanitizeParam($referer);
+                if (strlen($referer) > 512) {
+                    $referer = substr($referer, 0, 512);
+                }
+                $params['referer'] = $referer;
+            }
+
+            // Add UTM parameters from current request (already validated above, then sanitized)
+            $utmSource = request()->query('utm_source');
+            $utmMedium = request()->query('utm_medium');
+            $utmCampaign = request()->query('utm_campaign');
+            $utmContent = request()->query('utm_content');
+            $utmTerm = request()->query('utm_term');
+
+            if ($utmSource) {
+                $params['utm_source'] = $this->sanitizeParam($utmSource);
+            }
+            if ($utmMedium) {
+                $params['utm_medium'] = $this->sanitizeParam($utmMedium);
+            }
+            if ($utmCampaign) {
+                $params['utm_campaign'] = $this->sanitizeParam($utmCampaign);
+            }
+            if ($utmContent) {
+                $params['utm_content'] = $this->sanitizeParam($utmContent);
+            }
+            if ($utmTerm) {
+                $params['utm_term'] = $this->sanitizeParam($utmTerm);
+            }
+
+            // Append parameters to URL if any exist
+            if (! empty($params)) {
+                $separator = str_contains($url, '?') ? '&' : '?';
+                $query = http_build_query($params);
+                $url = $url . $separator . $query;
+            }
+        }
+
+        return redirect($url);
+    }
+
+    /**
+     * Sanitize a parameter value to prevent XSS and injection attacks.
+     */
+    private function sanitizeParam(string $value): string
+    {
+        // Remove HTML tags
+        $value = strip_tags($value);
+
+        // Escape HTML special characters to prevent XSS
+        $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+
+        // Trim whitespace
+        $value = trim($value);
+
+        return $value;
     }
 }
