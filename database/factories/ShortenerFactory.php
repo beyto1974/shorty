@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Helpers\HandleHelper;
+use App\Models\Shortener;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Shortener>
+ * @extends Factory<Shortener>
  */
 class ShortenerFactory extends Factory
 {

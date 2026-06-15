@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\CrudTrait;
+use Database\Factories\ShortenerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,7 +18,7 @@ class Shortener extends Model
 {
     use CrudTrait;
 
-    /** @use HasFactory<\Database\Factories\ShortenerFactory> */
+    /** @use HasFactory<ShortenerFactory> */
     use HasFactory;
 
     protected $fillable = [
