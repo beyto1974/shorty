@@ -62,6 +62,20 @@ Only http interface supported.
 
 URL: https://www.example/api/mcp/shortener
 
+Example config:
+```json
+{
+  "mcpServers": {
+    "url-shortener": {
+      "url": "https://dev.shorty.pro/api/mcp/shortener",
+      "headers": {
+        "Authorization": "Bearer <YOUR_TOKEN>"
+      }
+    }
+  }
+}
+```
+
 ## Other features
 - Status page returing {'ok': true}
 - Web user interface on /ui/ for bulk shortener creation.
